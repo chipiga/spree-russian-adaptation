@@ -6,6 +6,7 @@ end
 
 Time.zone = RUSSIAN_CONFIG['country']['timezone']
 I18n.default_locale = :'ru-RU'
+
 if Spree::Config.instance
   Spree::Config.set(:default_locale => :'ru-RU')
   Spree::Config.set(:default_country_id => RUSSIAN_CONFIG['country']['id'])
@@ -14,3 +15,8 @@ if Spree::Config.instance
 end
 
 ActiveMerchant::Billing::Base.mode = (RAILS_ENV == 'production') ? :live : :test
+
+
+require 'action_controller/mime_type'
+require 'prawn'
+Mime::Type.register 'application/pdf', :pdf
