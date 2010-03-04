@@ -1,5 +1,8 @@
+no_shipping:
+  name: "Самовывоз"
+  zone_id: 1
 ups_ground:
-  name: "Почтой (наложным платежём)"
+  name: "Почтой (наложенным платежом)"
   zone_id: 1
 ups_two_day:
   name: "Почтой (по предоплате)"

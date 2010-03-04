@@ -1,3 +1,7 @@
+no_shipping:
+  calculable: no_shipping
+  calculable_type: ShippingMethod
+  type: Calculator::FlatRate  
 ups_ground:
   calculable: ups_ground
   calculable_type: ShippingMethod
