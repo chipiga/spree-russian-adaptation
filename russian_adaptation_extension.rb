@@ -57,6 +57,10 @@ class RussianAdaptationExtension < Spree::Extension
       def bill_address
         ship_address || Address.default
       end
+      
+      def payment?
+        false
+      end
     end
     
     Checkout.state_machines[:state] =
