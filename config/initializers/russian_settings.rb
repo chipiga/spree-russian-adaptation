@@ -13,5 +13,3 @@ if Spree::Config.instance
   Spree::Config.set(:auto_capture => false)
   Spree::Config.set(:ship_form_requires_state => true)
 end
-
-ActiveMerchant::Billing::Base.mode = (RAILS_ENV == 'production') ? :live : :test

@@ -18,10 +18,7 @@ class RussianAdaptationExtension < Spree::Extension
     
     Time::DATE_FORMATS[:date_time24] = "%d.%m.%Y - %H:%M"
     Time::DATE_FORMATS[:short_date] = "%d.%m.%Y"
-    
-    require "active_merchant/billing/gateways/robo_kassa"
-    Gateway::RoboKassa.register
-    
+        
     # replace .to_url method provided by stringx gem by .parameterize provided by russian gem
     String.class_eval do
       def to_url
@@ -29,23 +26,6 @@ class RussianAdaptationExtension < Spree::Extension
       end
    	end
 
-
-    OrdersController.class_eval do
-      def sberbank_billing
-        if (@order.shipping_method.name =~ /предопл/ && can_access?)
-          render :layout => false
-        else
-          flash[:notice] = 'Счёт не найден.'
-          redirect_to root_path
-        end
-      end     
-    end
-
-    Gateway.class_eval do
-      def self.current
-        self.first :conditions => ["environment = ? AND active = ?", RAILS_ENV, true]
-      end
-    end
 
     Checkout.class_eval do
       validation_group :address, :fields=> [
@@ -63,15 +43,6 @@ class RussianAdaptationExtension < Spree::Extension
       end
     end
     
-    Checkout.state_machines[:state] =
-        StateMachine::Machine.new(Checkout, :initial => 'address') do
-          after_transition :to => 'complete', :do => :complete_order   
-          event :next do
-            transition :to => 'delivery', :from  => 'address'
-            transition :to => 'complete', :from => 'delivery'
-          end
-        end
-
     ActionView::Helpers::NumberHelper.module_eval do
       def number_to_currency(number, options = {})
         rub = number.to_i
@@ -95,7 +66,7 @@ class RussianAdaptationExtension < Spree::Extension
     end
 
     Admin::OrdersController.class_eval do
-      show.success.wants.pdf { render :layout => false, :template => 'admin/orders/show.pdf.prawn' }
+      show.wants.pdf
     end
 
   end
