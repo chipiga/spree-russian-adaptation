@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-font_directory = "#{SPREE_ROOT}/public/images/fonts"
+font_directory = "#{RussianAdaptationExtension.root}/public/images/fonts"
 pdf.font_families.update(
                          "Arial" => { :bold => "#{font_directory}/arialbd.ttf",
                            :italic      => "#{font_directory}/ariali.ttf",
@@ -13,7 +13,7 @@ invoice_config = RUSSIAN_CONFIG['invoice'].symbolize_keys
 ###################################
 # Шапка
 ###################################
-pdf.image "#{SPREE_ROOT}/public/#{invoice_config[:logo]}", :at => [10,720], :scale => 0.65
+pdf.image "#{ThemeDefaultExtension.root}/public/#{invoice_config[:logo]}", :at => [10,720], :scale => 0.65
 pdf.move_down 20
 pdf.text "#{I18n::t('invoice')} №#{@order.number}",
 :align => :center,

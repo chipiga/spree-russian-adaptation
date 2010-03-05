@@ -95,11 +95,7 @@ class RussianAdaptationExtension < Spree::Extension
     end
 
     Admin::OrdersController.class_eval do
-      show.success.wants.pdf { render :layout => false, :template => 'admin/orders/show.pdf.prawn'}
-    end
-
-    AppConfiguration.class_eval do
-      preference :print_invoice_logo_path, :string, :default => '/images/admin/bg/spree_50.png'
+      show.success.wants.pdf { render :layout => false, :template => 'admin/orders/show.pdf.prawn' }
     end
 
   end
