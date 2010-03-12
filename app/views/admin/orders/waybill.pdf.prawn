@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
+# TODO !!!
 font_directory = "#{RussianAdaptationExtension.root}/public/images/fonts"
-pdf.font_families.update(
-                         "Arial" => { :bold => "#{font_directory}/arialbd.ttf",
-                           :italic      => "#{font_directory}/ariali.ttf",
-                           :bold_italic => "#{font_directory}/arialbi.ttf",
-                           :normal      => "#{font_directory}/arial.ttf" })
+pdf.font_families.update("Arial" => { :bold => "#{font_directory}/arialbd.ttf",
+                                      :italic => "#{font_directory}/ariali.ttf",
+                                      :bold_italic => "#{font_directory}/arialbi.ttf",
+                                      :normal => "#{font_directory}/arial.ttf" })
 pdf.font "Arial"
 
+@order = @object
 ship_address = @order.ship_address
-invoice_config = RUSSIAN_CONFIG['invoice'].symbolize_keys
 
 ###################################
 # Шапка
 ###################################
-pdf.image "#{ThemeDefaultExtension.root}/public/#{invoice_config[:logo]}", :at => [10,720], :scale => 0.65
 pdf.move_down 20
-pdf.text "#{I18n::t('invoice')} №#{@order.number}",
+pdf.text "#{I18n::t('waybill')} №#{@order.number}",
 :align => :center,
 :style => :bold,
 :size => 16
@@ -30,7 +29,7 @@ pdf.text "#{I18n::t('invoice')} №#{@order.number}",
 pdf.move_down 20
 # pdf.text "#{Date.today}"
 # pdf.move_down 5
-pdf.text "От кого: #{invoice_config[:company_name]}"
+pdf.text "От кого: #{RUSSIAN_CONFIG['finance']['company_name']}"
 pdf.move_down 5
 pdf.text "Получатель: #{ship_address.firstname} #{ship_address.lastname}"
 pdf.move_down 15

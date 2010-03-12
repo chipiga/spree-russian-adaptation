@@ -3,7 +3,7 @@
 # require_dependency 'application'
 
 class RussianAdaptationExtension < Spree::Extension
-  version "0.2"
+  version "1.0"
   description "Adapts Spree to the Russian reality."
   url "http://github.com/romul/spree-russian-adaptation"
 
@@ -26,7 +26,15 @@ class RussianAdaptationExtension < Spree::Extension
       end
    	end
 
-
+    [PaymentMethod::Cash, PaymentMethod::Bank, Billing::RoboKassa].each {|m| m.register}
+    
+    # TODO remove this brutal hack
+    # Gateway.class_eval do
+    #   def self.current
+    #     new
+    #   end
+    # end
+    
     Checkout.class_eval do
       validation_group :address, :fields=> [
       "ship_address.firstname", "ship_address.lastname", "ship_address.phone", 
@@ -37,24 +45,8 @@ class RussianAdaptationExtension < Spree::Extension
       def bill_address
         ship_address || Address.default
       end
-      
-      def payment?
-        false
-      end
     end
-    
-    ActionView::Helpers::NumberHelper.module_eval do
-      def number_to_currency(number, options = {})
-        rub = number.to_i
-        kop = ((number - rub)*100).round.to_i
-        if (kop > 0)
-          "#{rub}&nbsp;#{RUSSIAN_CONFIG['country']['currency']}&nbsp;#{'%.2d' % kop}&nbsp;коп.".mb_chars
-        else
-          "#{rub}&nbsp;#{RUSSIAN_CONFIG['country']['currency']}".mb_chars
-        end
-      end
-    end
-    
+        
     Admin::BaseHelper.module_eval do 
       def text_area(object_name, method, options = {})
         begin
@@ -65,8 +57,49 @@ class RussianAdaptationExtension < Spree::Extension
       end      
     end
 
+    OrdersController.class_eval do
+      def receipt
+        render :layout => false
+      end
+      def invoice
+        render :layout => false
+      end
+    end
+    
     Admin::OrdersController.class_eval do
-      show.wants.pdf
+      def waybill
+        load_object
+      end
+      def cash_memo
+        load_object
+      end
+    end
+
+    # TODO Contribute and delete
+    Admin::PaymentsController.class_eval do
+      def build_object
+        @object = model.new(object_params)
+        @object.payable = parent_object.checkout
+        @payment = @object
+        if current_gateway and current_gateway.payment_profiles_supported? and params[:card].present? and params[:card] != 'new'
+          @object.source = Creditcard.find_by_id(params[:card])
+        end
+        @object
+      end
+    end
+    
+    # TODO Contribute and delete
+    CheckoutsController.class_eval do
+      def object_params
+        # For payment step, filter checkout parameters to produce the expected nested attributes for a single payment and its source, discarding attributes for payment methods other than the one selected
+        if object.payment?
+          if params.has_key?(:payment_source) and source_params = params.delete(:payment_source)[params[:checkout][:payments_attributes].first[:payment_method_id].underscore]
+            params[:checkout][:payments_attributes].first[:source_attributes] = source_params
+          end
+          params[:checkout][:payments_attributes].first[:amount] = @order.total
+        end
+        params[:checkout]
+      end
     end
 
   end

@@ -27,7 +27,8 @@ module ActiveMerchant #:nodoc:
         "0" => "нет ошибки. При этом присутствует тег <opstate>.",
         "1" => "указанный sMerchantLogin не найден",
         "9" => "неверно задана контрольная сумма", 
-        "10" => "операция с данным sInvId не найдена (возможно еще не инициирована)" }
+        "10" => "операция с данным sInvId не найдена (возможно еще не инициирована)"
+      }
 
       STATE_OPERATION ={
         '5' => 'только инициирована, деньги не получены',
@@ -38,7 +39,7 @@ module ActiveMerchant #:nodoc:
         '100' => 'операция завершена успешно'
       }
       
-  EXCHANGE_RATE_RET_CODE = { 
+      EXCHANGE_RATE_RET_CODE = { 
         '-100' => "неверно сформирован запрос (не все требуемые параметры заданы, либо запрос не разобран вовсе)",
         '0' => "нет ошибки.",
         '1' => "sIncCurrLabel задан неверно",
@@ -46,23 +47,21 @@ module ActiveMerchant #:nodoc:
         '3' => "sMerchantLogin не найден",
         '4' => "nOutCnt задан неверно" 
       }
-
       
       # The homepage URL of the gateway
       self.homepage_url = 'http://robokassa.ru/'
       
       # The name of the gateway
       self.display_name = 'RoboKassa'
-
       
       # Создание нового объекта RoboKassa
-      # 
       def initialize(options = {})
         @options = {
           :payment_currency => "WMR", 
           :language => "RU", 
           :encoding => "utf-8",
-          :value =>"Оплатить"}
+          :value =>"Оплатить"
+        }
         @options.merge!(options) 
         @custom_fields = { }        
         super
@@ -75,14 +74,13 @@ module ActiveMerchant #:nodoc:
       # :invoice = номер платежа 
       # :summa = сумма платежа
       # необязательные параметры
-      # :description: описание товара ("")
+      # description: описание товара ("")
       # language: язык (RU)
       # encoding: кодировка (UTF-8)
-      # payment_currentcy - валюта платежа (WMR)
-      # value - надпись на кнопки (Оплатить)
+      # payment_currentcy: валюта платежа (WMR)
+      # value: надпись на кнопки (Оплатить)
       def method_missing(method_id, options ={ }, shp_fields ={ })
-        if (method_id == :payment_button) ||
-            ( method_id == :payment_kassa)
+        if (method_id == :payment_button) || (method_id == :payment_kassa)
           @options.merge!(options)
           @custom_fields = shp_fields
           @options[:signature] = Digest::MD5.hexdigest([@options[:login], @options[:summa],
@@ -98,7 +96,8 @@ module ActiveMerchant #:nodoc:
           super
         end
       end
-       # При проверке указываеться пароль2 на проверку результат
+      
+      # При проверке указываеться пароль2 на проверку результат
       def result(params)
         out_sum,invoice_id = params[:OutSum], params[:InvId]
         in_signature = params[:SignatureValue]
@@ -107,8 +106,8 @@ module ActiveMerchant #:nodoc:
                                             shp_fields_to_param].flatten.join(':')) 
         in_signature.upcase == signature.upcase ? true : false
       end
-      
       alias :result? :result
+      
        # при проверки положительно завершения используеться пароль1
       def success(params)
         out_sum,invoice_id = params[:OutSum], params[:InvId]
@@ -119,13 +118,11 @@ module ActiveMerchant #:nodoc:
                                             shp_fields_to_param ].flatten.join(':')) 
         in_signature.upcase == signature.upcase ? true : false
       end
-      
       alias :success? :success
       
       # ==========================================================================================
       # XML - интерфейс
       # ==========================================================================================
-      
       
       # Статус операции
       # invoice - номер платежа
@@ -156,7 +153,7 @@ module ActiveMerchant #:nodoc:
         status = { }
         xml = REXML::Document.new(result)
 
-       elements =  REXML::XPath.first(xml, "robox.opstate.resp").root.elements
+        elements =  REXML::XPath.first(xml, "robox.opstate.resp").root.elements
         status[:retval] = STATE_OPERATION_RET_CODE[elements[1].text]
         status[:date] = elements[2].text
         status[:out_curr] =elements[3].text
@@ -219,12 +216,11 @@ module ActiveMerchant #:nodoc:
         return currency
       end
       
-     private
+      private
       
       def valid_invoice
         !@options[:invoice].nil? && !@options[:invoice].to_s.empty?
       end
-
       alias :valid_invoice? :valid_invoice
       
       def valid_summa
@@ -245,19 +241,19 @@ module ActiveMerchant #:nodoc:
       
       def button
         url = test? ? TEST_PAYMENT_FORM_URL : LIVE_PAYMENT_FORM_URL
-        submit = "<input type=submit value='#{@options[:value]}'>"
+        submit = "<input type='submit' value='#{@options[:value]}'>"
         params = [
-                  "<input type=hidden name=MrchLogin value='#{@options[:login]}'",
-                  "<input type=hidden name=OutSum value='#{@options[:summa]}'>",
-                  "<input type=hidden name=InvId value='#{@options[:invoice]}'>",
-                  "<input type=hidden name=Desc value='#{@options[:description]}'>",
-                  "<input type=hidden name=SignatureValue value=#{@options[:signature]}>",
-                  "<input type=hidden name=IncCurrLabel value=#{@options[:payment_currentcy]}>",
-                  "<input type=hidden name=Culture value=#{@options[:language]}>",
+                  "<input type='hidden' name='MrchLogin' value='#{@options[:login]}'>",
+                  "<input type='hidden' name='OutSum' value='#{@options[:summa]}'>",
+                  "<input type='hidden' name='InvId' value='#{@options[:invoice]}'>",
+                  "<input type='hidden' name='Desc' value='#{@options[:description]}'>",
+                  "<input type='hidden' name='SignatureValue' value='#{@options[:signature]}'>",
+                  "<input type='hidden' name='IncCurrLabel' value='#{@options[:payment_currentcy]}'>",
+                  "<input type='hidden' name='Culture' value='#{@options[:language]}'>",
                   shp_fields_to_html,
                   submit ].flatten.join()
 
-        return %{ <form action='#{url}' method=POST>#{params}</form>}        
+        return %{ <form action='#{url}' method='POST'>#{params}</form>}        
       end 
       
       def shp_fields_to_html
@@ -265,12 +261,10 @@ module ActiveMerchant #:nodoc:
       end
       
       def shp_fields_to_param
-        str =  @custom_fields.keys.collect{|x| x.to_s}.sort.
-          collect {|x| "#{x}=#{@custom_fields[x.to_sym]}" } 
+        str =  @custom_fields.keys.collect{|x| x.to_s}.sort.collect {|x| "#{x}=#{@custom_fields[x.to_sym]}" } 
         raise "Слишком много пользовательских параметров. Должно быть не больше 2048 знаков." if str.size >= 2048
         return str
       end
     end
   end
 end
-

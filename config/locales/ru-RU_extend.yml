@@ -18,8 +18,25 @@ ru-RU:
   Shipments: "Доставки"
   shipping_calculator: "Калькулятор"
   show_active: "Показать действующие"
-  invoice: "Накладная"
-
+  password1: "Первый пароль"
+  password2: "Второй пароль"
+  payment_currency: "Валюта платежа"
+  invoice: "Счет-фактура"
+  receipt: "Квитанция"
+  waybill: "Накладная"
+  cash_memo: "Товарный чек"
+  beneficiary_name: "Получатель платежа"
+  beneficiary_code: "ИНН"
+  beneficiary_code2: "КПП"
+  beneficiary_account: "Р/с №"
+  beneficiary_bank_name: "Банк получателя"
+  beneficiary_bank_address: "Адрес банка получателя"
+  beneficiary_bank_code: "БИК"
+  correspondent_bank_account: "Банк-корреспондент"
+  correspondent_bank_name: "К/с №"
+  correspondent_bank_address: "Адрес банка-корреспондента"
+  correspondent_bank_code: "Код банка-корреспондента"
+  
   authlogic:
     error_messages:
       email_invalid: "должен быть указан в верном формате xxx@xxx.tld"

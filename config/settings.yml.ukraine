@@ -1,6 +1,6 @@
-invoice:
+finance:
   company_name: "Интернет-магазин Фирма"
-  logo: "images/admin/bg/spree_50.png"
+  show_zero_kopek: false
 country:
   id: "211"
   name: "Украина"

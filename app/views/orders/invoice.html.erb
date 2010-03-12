@@ -1,0 +1,61 @@
+<html>
+<header>
+<style>
+td{font:normal 12px/140% Verdana,Geneva, sans-serif;
+color:#000;
+padding:5px;
+text-align:left;}
+.invoice{border:0px solid #000;
+border-collapse:collapse;
+width:650px;}
+table.index{border:1px solid #8a8a8a;
+border-collapse:collapse;
+width:650px;}
+table.index td{border:1px solid #8a8a8a;
+border-collapse:collapse;}
+td.price, td.qty {text-align:center;}
+td.total {text-align:right;}
+#footer{width:650px; text-align:right;}
+</style>
+</header>
+<body>
+  <h1><%= I18n::t("invoice") %> № <%= @order.number %> от <%= Time.now.strftime("%d.%m.%Y") %></h1>
+  <table cellpadding="3" class="invoice">
+  <% payment = @order.checkout.payments.detect{|p| p.payment_method.type.to_s == "PaymentMethod::Bank"} || @order.payments.detect{|p| p.payment_method.type.to_s == "PaymentMethod::Bank"}; pd = payment.payment_method.preferences.symbolize_keys! %>
+  <tr>
+    <td valign="top" width="200">
+      &nbsp;&nbsp;<b>Поставщик</b>
+    </td>
+    <td>
+      <%= pd[:beneficiary_name] %><br />
+      <%= I18n::t("beneficiary_code") %> <%= pd[:beneficiary_code] %><% unless pd[:beneficiary_code2].blank? %> / <%= I18n::t("beneficiary_code2") %> <%= pd[:beneficiary_code2] %><% end %><br />
+      <% unless pd[:correspondent_bank_account].blank? %><%= I18n::t("correspondent_bank_account") %> <%= pd[:correspondent_bank_account] %> <% end %><%= I18n::t("beneficiary_bank_code") %> <%= pd[:beneficiary_bank_code] %><br />
+      <%= I18n::t("beneficiary_account") %> <%= pd[:beneficiary_account] %> в <%= pd[:beneficiary_bank_name] %><% unless pd[:beneficiary_bank_address].blank? %> (<%= pd[:beneficiary_bank_address] %>)<% end %>      
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      &nbsp;&nbsp;<b>Получатель</b>
+    </td>
+    <td>
+      <%= [@order.ship_address.lastname, @order.shipment.address.firstname, @order.shipment.address.secondname].join('&nbsp;') %><br />
+      <%= [@order.ship_address.zipcode, @order.ship_address.country, @order.ship_address.state, @order.ship_address.city, @order.ship_address.address1, @order.ship_address.address2].join(',&nbsp;') %><br />
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">&nbsp;&nbsp;<b>Плательщик</b></td>
+    <td>Тот же</td>
+  </tr>
+  </table>
+  <br /><br /><br />
+  <% @hide_payment_links = true; save = RUSSIAN_CONFIG['country']['show_zero_kopek']; RUSSIAN_CONFIG['country']['show_zero_kopek'] = true; # TODO refactor! %>
+  <%= render 'shared/order_details';  %>
+  <% RUSSIAN_CONFIG['country']['show_zero_kopek'] = save; @hide_payment_links = false %>
+  <br /><br /><br /><br /><br /><br /><br />
+  <div id="footer">М.П.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_______________/_____________________/</div>
+  
+  <script language="JavaScript" type="text/JavaScript">
+  //setTimeout('window.print()',1000);
+  </script>
+</body>
+</html>

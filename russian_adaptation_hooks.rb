@@ -8,12 +8,15 @@ class RussianAdaptationHooks < Spree::ThemeSupport::HookListener
     %(<%= javascript_include_tag :ckeditor %>) if defined?(Ckeditor)
   end
 
-  insert_after :admin_order_show_buttons do
-    %( <%= button_link_to(I18n::t("invoice"), admin_order_url(@order, :format => :pdf)) %>)
+  insert_before :admin_order_show_buttons do
+    %( <%= button_link_to(I18n::t("waybill"), waybill_admin_order_url(@order, :format => :pdf)) <<
+           button_link_to(I18n::t("cash_memo"), cash_memo_admin_order_url(@order, :format => :pdf)) %>)
   end
 
-  insert_after :admin_order_edit_buttons do
-    %( <%= button_link_to(I18n::t("invoice"), admin_order_url(@order, :format => :pdf)) %>)
+  insert_before :admin_order_edit_buttons do
+    %( <%= button_link_to(I18n::t("waybill"), waybill_admin_order_url(@order, :format => :pdf)) <<
+           button_link_to(I18n::t("cash_memo"), cash_memo_admin_order_url(@order, :format => :pdf)) %>)
   end
 
+  insert_after :order_details_total, 'orders/payment_links'
 end
