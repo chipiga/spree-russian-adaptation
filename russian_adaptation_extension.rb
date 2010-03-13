@@ -25,15 +25,8 @@ class RussianAdaptationExtension < Spree::Extension
         self.parameterize
       end
    	end
-
+   	
     [PaymentMethod::Cash, PaymentMethod::Bank, Billing::RoboKassa].each {|m| m.register}
-    
-    # TODO remove this brutal hack
-    # Gateway.class_eval do
-    #   def self.current
-    #     new
-    #   end
-    # end
     
     Checkout.class_eval do
       validation_group :address, :fields=> [
@@ -47,16 +40,6 @@ class RussianAdaptationExtension < Spree::Extension
       end
     end
         
-    Admin::BaseHelper.module_eval do 
-      def text_area(object_name, method, options = {})
-        begin
-          ckeditor_textarea(object_name, method, :width => '100%', :height => '350px')
-        rescue
-          super
-        end
-      end      
-    end
-
     OrdersController.class_eval do
       def receipt
         render :layout => false
@@ -74,34 +57,38 @@ class RussianAdaptationExtension < Spree::Extension
         load_object
       end
     end
+    
+    AppConfiguration.class_eval do
+      preference :show_currency_with_kopek, :boolean
+      preference :show_currency_with_zero_kopek, :boolean
+    end
 
-    # TODO Contribute and delete
-    Admin::PaymentsController.class_eval do
-      def build_object
-        @object = model.new(object_params)
-        @object.payable = parent_object.checkout
-        @payment = @object
-        if current_gateway and current_gateway.payment_profiles_supported? and params[:card].present? and params[:card] != 'new'
-          @object.source = Creditcard.find_by_id(params[:card])
+    ApplicationHelper.module_eval do
+      def number_to_currency(number, options = {})
+        options.symbolize_keys!
+        with_kopek = options.delete(:with_kopek) || Spree::Config[:show_currency_with_kopek]
+        if I18n.locale == I18n.default_locale and with_kopek
+          with_zero_kopek = options.delete(:with_zero_kopek) || Spree::Config[:show_currency_with_zero_kopek]
+          if (number - number.floor).zero? and !with_zero_kopek
+            options.merge!(:precision => 0) # нет копеек
+          else
+            options.merge!(:format => "%n коп.", :separator => " %u ") # есть копейки
+          end
         end
-        @object
+        super(number, options) 
       end
     end
     
-    # TODO Contribute and delete
-    CheckoutsController.class_eval do
-      def object_params
-        # For payment step, filter checkout parameters to produce the expected nested attributes for a single payment and its source, discarding attributes for payment methods other than the one selected
-        if object.payment?
-          if params.has_key?(:payment_source) and source_params = params.delete(:payment_source)[params[:checkout][:payments_attributes].first[:payment_method_id].underscore]
-            params[:checkout][:payments_attributes].first[:source_attributes] = source_params
-          end
-          params[:checkout][:payments_attributes].first[:amount] = @order.total
+    Admin::BaseHelper.module_eval do 
+      def text_area(object_name, method, options = {})
+        begin
+          ckeditor_textarea(object_name, method, :width => '100%', :height => '350px')
+        rescue
+          super
         end
-        params[:checkout]
-      end
+      end      
     end
-
+    
   end
 end
 

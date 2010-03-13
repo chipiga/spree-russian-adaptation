@@ -1,6 +1,5 @@
 class RoboKassaController < Spree::BaseController
-  before_filter :load_order
-  before_filter :load_robo_kassa
+  before_filter :load_order_and_robo_kassa
   
   # TODO log results?
   def result
@@ -28,32 +27,21 @@ class RoboKassaController < Spree::BaseController
 
   private 
 
-  def load_order
+  def load_order_and_robo_kassa
     number = 'R' + params[:InvId]
     @order = Order.find_by_number(number)
-    unless @order
-      flash[:error] = "Заказ с номером #{number} не найден."
-      redirect_to root_url
-    end
-    if @order.paid?
-      flash[:error] = "Заказ с номером #{number} уже оплачен."
-      redirect_to root_url
-    end
-    unless @order.checkout.complete?
-      flash[:error] = "Заказ с номером #{number} еще не оформлен."
-      redirect_to root_url
-    end
-    unless @order.checkout.payments.detect{|p| p.payment_method.class.to_s == "Billing::RoboKassa"} # TODO p.payment_method.method_type == "robokassa"
-      flash[:error] = "Заказ с номером #{number} не может быть оплачен этим способом."
-      redirect_to root_url
-    end
-  end
-  
-  def load_robo_kassa
     @robo_kassa = Billing::RoboKassa.current.try(:provider)
-    unless @robo_kassa
+    if !@robo_kassa
       flash[:error] = "Этот способ оплаты не активен."
-      redirect_to root_url
+    elsif !@order
+      flash[:error] = "Заказ с номером #{number} не найден."
+    elsif @order.paid?
+      flash[:error] = "Заказ с номером #{number} уже оплачен."
+    elsif !@order.checkout.complete?
+      flash[:error] = "Заказ с номером #{number} еще не оформлен."
+    elsif !@order.checkout.payments.detect{|p| p.payment_method.class.to_s == "Billing::RoboKassa"} # TODO p.payment_method.method_type == "robokassa"
+      flash[:error] = "Заказ с номером #{number} не может быть оплачен этим способом."
     end
+    redirect_to root_url if flash[:error]
   end
 end

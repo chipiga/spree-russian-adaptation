@@ -29,7 +29,7 @@ pdf.text "#{I18n::t('cash_memo')} №#{@order.number}",
 pdf.move_down 20
 # pdf.text "#{Date.today}"
 # pdf.move_down 5
-pdf.text "От кого: #{RUSSIAN_CONFIG['finance']['company_name']}"
+pdf.text "От кого: #{RUSSIAN_SETTINGS['finance']['company_name']}"
 pdf.move_down 5
 pdf.text "Получатель: #{ship_address.firstname} #{ship_address.lastname}"
 pdf.move_down 15

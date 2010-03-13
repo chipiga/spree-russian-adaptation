@@ -48,9 +48,9 @@ td.total {text-align:right;}
   </tr>
   </table>
   <br /><br /><br />
-  <% @hide_payment_links = true; save = RUSSIAN_CONFIG['country']['show_zero_kopek']; RUSSIAN_CONFIG['country']['show_zero_kopek'] = true; # TODO refactor! %>
+  <% @hide_payment_links = true; save = Spree::Config[:show_currency_with_kopek]; Spree::Config.set(:show_currency_with_kopek => false) %>
   <%= render 'shared/order_details';  %>
-  <% RUSSIAN_CONFIG['country']['show_zero_kopek'] = save; @hide_payment_links = false %>
+  <% @hide_payment_links = false; Spree::Config.set(:show_currency_with_kopek => save) %>
   <br /><br /><br /><br /><br /><br /><br />
   <div id="footer">М.П.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_______________/_____________________/</div>
   

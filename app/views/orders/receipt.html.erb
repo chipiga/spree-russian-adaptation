@@ -56,7 +56,7 @@ margin:3px 0 10px;}
       <tr>
         <td align="left">Оплата заказа № <%= @order.number %></td>
         <td width="" valign="bottom"><%= Time.now.strftime("%d.%m.%Y") %></td>
-        <td width="" valign="bottom"><%= number_to_currency @order.total, :show_zero_kopek => true %></td>
+        <td width="" valign="bottom"><%= number_to_currency @order.total, :with_zero_kopek => true %></td>
       </tr>
       <tr>
         <td colspan="3" valign="center"><br><small>Плательщик (ФИО, подпись):</small>&nbsp;<em><%= [@order.ship_address.lastname, @order.shipment.address.firstname, @order.shipment.address.secondname].join('&nbsp;') %></em></td>
