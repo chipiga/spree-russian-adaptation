@@ -10,7 +10,8 @@ class RussianAdaptationExtension < Spree::Extension
   # Please use russian_adaptation/config/routes.rb instead for extension routes.
 
   def self.require_gems(config)
-    config.gem 'russian', :lib => 'russian', :source => 'http://gemcutter.org'
+    config.gem 'russian'
+    # config.gem 'rutils'
     config.gem 'prawn'
   end
 
