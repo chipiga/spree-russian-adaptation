@@ -42,11 +42,20 @@ class RussianAdaptationExtension < Spree::Extension
     end
         
     OrdersController.class_eval do
+      helper BanksHelper
+      before_filter :fetch_payment_details, :only => [:receipt, :invoice]
+      
       def receipt
         render :layout => false
       end
       def invoice
         render :layout => false
+      end
+      
+      private
+      def fetch_payment_details
+        payment = @order.checkout.payments.detect{|p| p.payment_method.type.to_s == "PaymentMethod::Bank"} || @order.payments.detect{|p| p.payment_method.type.to_s == "PaymentMethod::Bank"}
+        @pd = payment.payment_method.preferences.symbolize_keys!        
       end
     end
     

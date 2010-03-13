@@ -25,7 +25,6 @@ margin:3px 0 10px;}
 </header>
 <body>
 <table cellpadding="3" class="kvit">
-<% payment = @order.checkout.payments.detect{|p| p.payment_method.type.to_s == "PaymentMethod::Bank"} || @order.payments.detect{|p| p.payment_method.type.to_s == "PaymentMethod::Bank"}; pd = payment.payment_method.preferences.symbolize_keys! %>
 <% 2.times do %>
   <tr>
     <td align="left" width="230" class="dashed">
@@ -37,14 +36,11 @@ margin:3px 0 10px;}
     <table border="0" cellpadding="0">
       </tr>
         <td colspan="3">
-          <%= I18n::t("beneficiary_name") %>: <%= pd[:beneficiary_name] %><br />
-          <%= I18n::t("beneficiary_code") %> <%= pd[:beneficiary_code] %><% unless pd[:beneficiary_code2].blank? %> / <%= I18n::t("beneficiary_code2") %> <%= pd[:beneficiary_code2] %><% end %><br />
-          <% unless pd[:correspondent_bank_account].blank? %><%= I18n::t("correspondent_bank_account") %> <%= pd[:correspondent_bank_account] %> <% end %><%= I18n::t("beneficiary_bank_code") %> <%= pd[:beneficiary_bank_code] %><br />
-          <%= I18n::t("beneficiary_account") %> <%= pd[:beneficiary_account] %> в <%= pd[:beneficiary_bank_name] %><% unless pd[:beneficiary_bank_address].blank? %> (<%= pd[:beneficiary_bank_address] %>)<% end %>
+          <%= I18n::t("beneficiary_name") %>: <%= payment_details(@pd) %>
         </td>
       </tr>
       <tr>
-        <td COLSPAN="3"><%= @order.ship_address.zipcode %>, г.&nbsp;<%= @order.ship_address.city %>, <%= [@order.ship_address.address1, @order.ship_address.address2].join  %>
+        <td COLSPAN="3"><%= payer_address(@order.checkout.bill_address)  %>
         <div align="center" class="comment"><small>Адрес плательщика</small></div>
         </td>
       </tr>
@@ -59,7 +55,7 @@ margin:3px 0 10px;}
         <td width="" valign="bottom"><%= number_to_currency @order.total, :with_zero_kopek => true %></td>
       </tr>
       <tr>
-        <td colspan="3" valign="center"><br><small>Плательщик (ФИО, подпись):</small>&nbsp;<em><%= [@order.ship_address.lastname, @order.shipment.address.firstname, @order.shipment.address.secondname].join('&nbsp;') %></em></td>
+        <td colspan="3" valign="center"><br><small>Плательщик (ФИО, подпись):</small>&nbsp;<em><%= payer_name(@order.checkout.bill_address) %></em></td>
       </tr>
     </table>
     </td>

@@ -8,5 +8,4 @@ country:
   id: "168"
   name: "Россия"
   description: "Российская Федерация"
-  currency: "р."
   timezone: "Moscow"

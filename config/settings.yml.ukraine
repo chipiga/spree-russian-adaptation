@@ -8,5 +8,4 @@ country:
   id: "211"
   name: "Украина"
   description: "Украина"
-  currency: "грн."
   timezone: "Kyev"

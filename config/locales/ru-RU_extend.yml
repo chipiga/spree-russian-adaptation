@@ -32,8 +32,8 @@ ru-RU:
   beneficiary_bank_name: "Банк получателя"
   beneficiary_bank_address: "Адрес банка получателя"
   beneficiary_bank_code: "БИК"
-  correspondent_bank_account: "Банк-корреспондент"
-  correspondent_bank_name: "К/с №"
+  correspondent_account: "К/с №"
+  correspondent_bank_name: "Банк-корреспондент"
   correspondent_bank_address: "Адрес банка-корреспондента"
   correspondent_bank_code: "Код банка-корреспондента"
   
