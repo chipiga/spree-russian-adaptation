@@ -12,7 +12,7 @@ class RoboKassaController < Spree::BaseController
  
   def success
     if @robo_kassa.success?(params)
-      @order.pay # move to paid state
+      @order.checkout.payments.first.finalize!
       flash[:notice] = 'Платёж принят, спасибо!'
     else
       flash[:error] = 'Платёж не прошёл проверку подписи.'
