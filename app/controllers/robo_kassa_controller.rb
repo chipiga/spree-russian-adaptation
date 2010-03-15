@@ -4,7 +4,7 @@ class RoboKassaController < Spree::BaseController
   # TODO log results?
   def result
     if @robo_kassa.result?(params)
-      render :text => "OK#{params[:InvId]}", :status => :ok
+      render :text => "OK#{@order.number}", :status => :ok
     else
       render :text => "Signature is invalid", :status => :ok
     end
@@ -28,7 +28,7 @@ class RoboKassaController < Spree::BaseController
   private 
 
   def load_order_and_robo_kassa
-    number = 'R' + params[:InvId]
+    number = "R%.9d" % params[:InvId]
     @order = Order.find_by_number(number)
     @robo_kassa = Billing::RoboKassa.current.try(:provider)
     if !@robo_kassa
