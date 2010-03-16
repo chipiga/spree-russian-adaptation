@@ -40,7 +40,11 @@ class RussianAdaptationExtension < Spree::Extension
         ship_address || Address.default
       end
     end
-        
+    
+    OrderMailer.class_eval do
+      default_url_options[:host] = Spree::Config[:site_url]
+    end
+    
     OrdersController.class_eval do
       helper BanksHelper
       before_filter :fetch_payment_details, :only => [:receipt, :invoice]
