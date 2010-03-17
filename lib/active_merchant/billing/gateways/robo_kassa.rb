@@ -236,7 +236,7 @@ module ActiveMerchant #:nodoc:
                   "Culture=#{@options[:language]}", "Encoding=#{@options[:encoding]}",
                   shp_fields_to_param ].flatten.join('&')
         src = [url, params].join('?')
-        return  %{<script language=JavaScript src='#{src}'> </script>}        
+        return  %{<script language='JavaScript' src='#{src}'> </script>}        
       end
       
       def button
@@ -257,7 +257,7 @@ module ActiveMerchant #:nodoc:
       end 
       
       def shp_fields_to_html
-        @custom_fields.collect{ |k,v| "<input type=hidden name='#{k}' value='#{v}'>" }
+        @custom_fields.collect{ |k,v| "<input type='hidden' name='#{k}' value='#{v}'>" }
       end
       
       def shp_fields_to_param
